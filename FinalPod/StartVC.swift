@@ -9,18 +9,34 @@
 import UIKit
 
 class StartVC: UIViewController {
-    var iTunesRequest : Request!
-    //Mark: - User Interface
-    @IBOutlet var featuredCollectionView: UICollectionView!
-    @IBOutlet var topCollectionView: UICollectionView!
-    @IBOutlet var genreCollectionView: UICollectionView!
-    @IBOutlet var networkCollectionView: UICollectionView!
     
-
+    @IBOutlet var tableView: UITableView!
+    
+    var collection : PodcastCollection!
+    //Mark: - User Interface
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        DispatchQueue.global(qos: .userInteractive).async {
-            self.iTunesRequest = Request(type: .ItunesUserRequest(userSearchString: "Маяк"))
-        }
-    }   
+        tableView.dataSource = self
+        tableView.delegate = self
+        collection = PodcastCollection(ofType: .ItunesUserRequest(userSearchString: "Маяк"))
+    }
+}
+
+extension StartVC : UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return collection.list.count
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "PodcastCell", for: indexPath) as! PodcastCell
+        cell.podcast = collection.list[indexPath.row]
+        cell.checkPodcast()
+        return cell
+    }
+}
+extension StartVC : UITableViewDelegate {
+    
 }
